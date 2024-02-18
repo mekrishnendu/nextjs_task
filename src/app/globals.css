@@ -13,10 +13,13 @@
     max-width: 1200px;
     margin: 0 auto;
 }
+/* .content-area{
+
+} */
 
 @layer components {
     .item-box {
-        @apply  rounded-md cursor-pointer bg-white text-center w-80 h-40 flex justify-center shadow-md shadow-neutral-300 hover:shadow-neutral-600;
+        @apply  rounded-md cursor-pointer bg-white text-center content-center text-stone-700 w-80 h-40 flex justify-center shadow-md shadow-neutral-300 hover:shadow-neutral-600;
     }
   }
 
