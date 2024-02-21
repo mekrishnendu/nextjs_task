@@ -6,11 +6,13 @@ export default function Login() {
   return (
     <main>
       <div className="login-page-outer bg-gray-800 h-screen flex items-center justify-center bg-gradient-to-r from-slate-900 to-slate-700">
-        <div className="rounded-lg bg-slate-500 p-12 w-[450] text-left bg-gradient-to-r from-cyan-500 to-blue-500">
+        <div className="rounded-lg bg-slate-500 p-8 w-[450] text-left bg-gradient-to-r from-cyan-500 to-blue-500">
           <form>
-            <div className="">
-              <div className="flex justify-center mb-10">
-                <div className="bg-gray-400 rounded-full w-[100px] h-[100px] text-center">
+            <div className="text-white">
+              <h1 className="text-center text-3xl mb-2">Welcome</h1>
+              <p className="text-center mb-4 text-sm">Sign in to continue our application.</p>
+              <div className="flex justify-center mb-8">
+                <div className="bg-white rounded-full w-[100px] h-[100px] text-center">
                   <Image
                     src="/images/person.png"
                     width={72}
@@ -20,19 +22,25 @@ export default function Login() {
                   />
                 </div>
               </div>
-              <div className="flex justify-between mb-10 items-center">
+              <div className="flex justify-between mb-6 items-center">
                 <label className="w-[100px] block text-white text-md ">Email Id:</label>
-                <input type="text" className="py-2 px-4 rounded-md" />
+                <input type="text" className="py-2 px-4 rounded-md text-sm" />
               </div>
 
-              <div className="flex justify-between mb-10 items-center">
+              <div className="flex justify-between mb-6 items-center">
                 <label className="w-[100px] block text-white text-md">Password:</label>
-                <input type="password" className="py-2 px-4 rounded-md" />
+                <input type="password" className="py-2 px-4 rounded-md text-sm" />
               </div>
 
-              <button type="submit" className="rounded-md bg-white p-2 px-10 ml-[100px]">
+              <button
+                type="submit"
+                className="rounded-md bg-white text-black p-2 px-10 ml-[100px] mb-10"
+              >
                 Login
               </button>
+              <p className="text-center text-sm">
+                Dont have an account? <strong className="underline">Sign Up</strong>{' '}
+              </p>
             </div>
           </form>
         </div>
