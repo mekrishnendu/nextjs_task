@@ -23,7 +23,7 @@ export default function Registration() {
 
           <div className="flex justify-between mb-6 items-center">
             <div className="flex justify-between  items-center">
-              <label className="w-[170px] block text-white text-md text-right">First Name:</label>
+              <label className="w-[170px] block text-white text-sm text-right">First Name:</label>
               <input
                 type="text"
                 className="py-2 px-4 rounded-md text-sm text-black ml-2"
@@ -31,7 +31,7 @@ export default function Registration() {
               />
             </div>
             <div className="flex justify-between  items-center">
-              <label className="w-[170px] block text-white text-md text-right">Last Name:</label>
+              <label className="w-[170px] block text-white text-sm text-right">Last Name:</label>
               <input
                 type="text"
                 className="py-2 px-4 rounded-md text-sm text-black ml-2"
@@ -42,7 +42,7 @@ export default function Registration() {
 
           <div className="flex justify-between mb-6 items-center">
             <div className="flex justify-between items-center">
-              <label className="w-[170px] block text-white text-md text-right">Email Id:</label>
+              <label className="w-[170px] block text-white text-sm text-right">Email Id:</label>
               <input
                 type="text"
                 className="py-2 px-4 rounded-md text-sm text-black ml-2"
@@ -51,7 +51,7 @@ export default function Registration() {
             </div>
 
             <div className="flex justify-between  items-center">
-              <label className="w-[170px] block text-white text-md text-right">Phone No:</label>
+              <label className="w-[170px] block text-white text-sm text-right">Phone No:</label>
               <input
                 type="number"
                 className="py-2 px-4 rounded-md text-sm text-black ml-2"
@@ -62,7 +62,7 @@ export default function Registration() {
 
           <div className="flex justify-between mb-6 items-center">
             <div className="flex justify-between  items-center">
-              <label className="w-[170px] block text-white text-md text-right">Password:</label>
+              <label className="w-[170px] block text-white text-sm text-right">Password:</label>
               <input
                 type="password"
                 className="py-2 px-4 rounded-md text-sm text-black ml-2"
@@ -71,7 +71,7 @@ export default function Registration() {
             </div>
 
             <div className="flex justify-between items-center">
-              <label className="w-[170px] block text-white text-md text-right">
+              <label className="w-[170px] block text-white text-sm text-right">
                 Confirm Password:
               </label>
               <input
@@ -82,7 +82,7 @@ export default function Registration() {
             </div>
           </div>
           <div className="flex  mb-6 items-center">
-            <label className="w-[170px] block text-white text-md text-right">Gender:</label>
+            <label className="w-[170px] block text-white text-sm text-right">Gender:</label>
             <div class="flex items-center me-4">
               <input
                 id="male"
@@ -112,7 +112,10 @@ export default function Registration() {
             <p className="mb-4 text-sm text-right italic">
               All the fields are required(<span className="text-xs align-top">*</span>).
             </p>
-            <button type="submit" className="rounded-md bg-white text-black p-2  mb-5 w-52">
+            <button
+              type="submit"
+              className="rounded-md bg-white text-black p-2  mb-5 w-52 hover:bg-slate-200"
+            >
               Sign in
             </button>
             <p className=" text-sm">
