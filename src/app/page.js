@@ -10,7 +10,7 @@ export default function Login() {
           <form>
             <div className="text-white">
               <h1 className="text-center text-3xl mb-2">Welcome</h1>
-              <p className="text-center mb-4 text-sm">Sign in to continue our application.</p>
+              <p className="text-center mb-4 text-sm">Sign in to continue the application.</p>
               <div className="flex justify-center mb-8">
                 <div className="bg-white rounded-full w-[100px] h-[100px] text-center">
                   <Image
@@ -23,13 +23,13 @@ export default function Login() {
                 </div>
               </div>
               <div className="flex justify-between mb-6 items-center">
-                <label className="w-[100px] block text-white text-md ">Email Id:</label>
-                <input type="text" className="py-2 px-4 rounded-md text-sm" />
+                <label className="w-[100px] block text-white text-md">Email Id:</label>
+                <input type="text" className="py-2 px-4 rounded-md text-sm text-black" />
               </div>
 
               <div className="flex justify-between mb-6 items-center">
                 <label className="w-[100px] block text-white text-md">Password:</label>
-                <input type="password" className="py-2 px-4 rounded-md text-sm" />
+                <input type="password" className="py-2 px-4 rounded-md text-sm text-black" />
               </div>
 
               <button
