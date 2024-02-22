@@ -24,12 +24,20 @@ export default function Login() {
               </div>
               <div className="flex justify-between mb-6 items-center">
                 <label className="w-[100px] block text-white text-md">Email Id:</label>
-                <input type="text" className="py-2 px-4 rounded-md text-sm text-black" />
+                <input
+                  type="text"
+                  className="py-2 px-4 rounded-md text-sm text-black"
+                  placeholder="Enter your email id"
+                />
               </div>
 
               <div className="flex justify-between mb-6 items-center">
                 <label className="w-[100px] block text-white text-md">Password:</label>
-                <input type="password" className="py-2 px-4 rounded-md text-sm text-black" />
+                <input
+                  type="password"
+                  className="py-2 px-4 rounded-md text-sm text-black"
+                  placeholder="Enter your password"
+                />
               </div>
 
               <button
@@ -39,7 +47,10 @@ export default function Login() {
                 Login
               </button>
               <p className="text-center text-sm">
-                Dont have an account? <strong className="underline">Sign Up</strong>{' '}
+                Dont have an account?{' '}
+                <Link href="/registration">
+                  <strong className="underline">Sign Up</strong>
+                </Link>{' '}
               </p>
             </div>
           </form>
