@@ -2,11 +2,11 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 const userSchema = new Schema(
   {
-    firstname: {
+    firstName: {
       type: String,
       required: true,
     },
-    lastname: {
+    lastName: {
       type: String,
       required: true,
     },
@@ -15,21 +15,21 @@ const userSchema = new Schema(
       unique: true,
       required: true,
     },
-    password: {
-      type: String,
-      required: false,
+    phone: {
+      type: Number,
+      required: true,
     },
     gender: {
       type: String,
       required: true,
     },
-    phone: {
-      type: Number,
-      required: true,
+    password: {
+      type: String,
+      required: false,
     },
   },
   { timestamps: true }
 );
 
-export const Users = mongoose.models.Member || mongoose.model('Member', userSchema);
+export const Member = mongoose.models.Member || mongoose.model('Member', userSchema);
 /* Member is the member connection of the database */
