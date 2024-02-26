@@ -12,7 +12,7 @@ export const options = {
         console.log('Profile GitHub===##: ', profile);
 
         let userRole = 'GitHub User';
-        if (profile?.email == 'krishnendu.pal2000@gmail.com') {
+        if (profile?.email == 'krishnendu.frontend@gmail.com') {
           userRole = 'admin';
         }
 

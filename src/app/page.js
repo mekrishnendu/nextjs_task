@@ -105,8 +105,19 @@ export default function Login() {
                 </p>
               </div>
 
-              <button type="submit" className="rounded-md bg-white text-black p-2 px-10 ml-[100px]">
+              <button
+                type="submit"
+                className="rounded-md bg-white text-black p-2 px-10 ml-[100px] mb-2"
+              >
                 Login
+              </button>
+              <hr className="login-separater" />
+              <button
+                onClick={() => signIn('github')}
+                className="rounded-md bg-white text-black p-2 px-10 ml-[60px]"
+                type="button"
+              >
+                Sign In with Github
               </button>
 
               {error && <p className="text-center text-sm  bg-red-700  mt-5">{error && error}</p>}

@@ -13,6 +13,25 @@
     max-width: 1200px;
     margin: 0 auto;
 }
+.login-separater{
+    height: 30px;
+    text-align: center;
+    border: 0;
+    border-top: 1px solid #fff;
+    margin: 1rem auto 0.12rem;
+    overflow: visible;
+    font-size: 14px;
+}
+.login-separater::before{
+    color: #fff;
+    content: "or";
+    padding: 0 0.4rem;
+    position: relative;
+    top: -0.7rem;
+    background-color: #6697df;
+    z-index: 2;
+
+}
 
 @layer components {
     .item-box {
