@@ -105,25 +105,26 @@ export default function Login() {
                 </p>
               </div>
 
-              <button
-                type="submit"
-                className="rounded-md bg-white text-black p-2 px-10 ml-[100px] mb-10"
-              >
+              <button type="submit" className="rounded-md bg-white text-black p-2 px-10 ml-[100px]">
                 Login
               </button>
-              <p className="text-center text-sm  bg-red-700">{error && error}</p>
-              <p className="text-center text-xs mb-2">
-                Forget password?{' '}
-                <Link href="/registration">
-                  <strong className="underline">Click here</strong>
-                </Link>{' '}
-              </p>
-              <p className="text-center text-sm">
-                Dont have an account?{' '}
-                <Link href="/registration">
-                  <strong className="underline">Sign Up</strong>
-                </Link>{' '}
-              </p>
+
+              {error && <p className="text-center text-sm  bg-red-700  mt-5">{error && error}</p>}
+
+              <div className="mt-8">
+                <p className="text-center text-xs mb-4">
+                  Forget password?{' '}
+                  <Link href="#">
+                    <strong className="underline">Click here</strong>
+                  </Link>{' '}
+                </p>
+                <p className="text-center text-sm">
+                  Dont have an account?{' '}
+                  <Link href="/registration">
+                    <strong className="underline">Sign Up</strong>
+                  </Link>{' '}
+                </p>
+              </div>
             </div>
           </form>
         </div>
