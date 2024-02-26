@@ -3,9 +3,14 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function Navigation() {
   const pathName = usePathname();
+  const { data: session } = useSession();
+
+  console.log('session##', session);
+
   return (
     <header>
       <div className="flex justify-between items-center px-5 py-2">
@@ -13,7 +18,9 @@ export default function Navigation() {
           <Link href="#">
             <Image src="../images/logo.svg" alt="logo" width={50} height={50} className="mr-50" />
           </Link>
-          <span className="ml-24">Welcome Mr.David Doe</span>
+          <span className="ml-24">
+            Welcome Mr.David Doe , {session && <h4>Welcome {session.user?.email} </h4>}
+          </span>
         </div>
         <nav className="text-right">
           <ul className="text-gray-700 flex">
@@ -134,28 +141,54 @@ export default function Navigation() {
                 </svg>
               </a>
             </li>
-            <li>
-              <a
-                href="/logout"
-                className="flex justify-end mr-4 text-red-600 hover:text-red-800  border-b-2 border-white"
-              >
-                <span>Logout</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-5 ml-1"
+            {session ? (
+              <li>
+                <a
+                  href="#"
+                  className="flex justify-end mr-4 text-red-600 hover:text-red-800  border-b-2 border-white"
+                  onClick={() => signOut({ callbackUrl: '/' })}
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
-                  />
-                </svg>
-              </a>
-            </li>
+                  <span>Logout</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 ml-1"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
+                    />
+                  </svg>
+                </a>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href="#"
+                  className="flex justify-end mr-4 text-red-600 hover:text-red-800  border-b-2 border-white"
+                >
+                  <span>Login</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-5 ml-1"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
+                    />
+                  </svg>
+                </a>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

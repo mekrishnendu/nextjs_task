@@ -2,8 +2,8 @@ import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { connectionStr } from '../../../lib/db';
 import mooongose from 'mongoose';
-import { Users } from '@/app/lib/model/userregistration';
-import bcrypt from 'bcryptjs';
+import { Member } from '@/app/lib/model/userregistration';
+import bcrypt from 'bcrypt';
 
 export const options = {
   providers: [
@@ -34,7 +34,7 @@ export const options = {
       async authorize(credentials) {
         await mooongose.connect(connectionStr);
         try {
-          const user = await Users.findOne({ email: credentials.email });
+          const user = await Member.findOne({ email: credentials.email });
           if (user) {
             const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
             if (isPasswordCorrect) {
