@@ -24,14 +24,34 @@ const profileSchema = yup.object({
 });
 
 export default function Profile() {
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session } = useSession();
+
   const [error, setError] = useState('');
+  const [profiles, setProfiles] = useState([]);
+
+  async function getProfiles() {
+    let profilesData = await fetch(`http://localhost:3000/api/profile`);
+    profilesData = await profilesData.json();
+    let userProfile = profilesData.data.filter((data) => data.email === session?.user?.email);
+    console.log('userProfile', userProfile, session);
+    setProfiles(userProfile);
+  }
+
+  useEffect(() => {
+    getProfiles();
+  }, []);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(profileSchema),
+    values: {
+      email: session?.user?.email || '',
+      name: session?.user?.name || '',
+      ...profiles,
+    },
   });
 
   const onSubmit = async (values) => {
@@ -76,12 +96,7 @@ export default function Profile() {
                 <label>Name:</label>
               </div>
               <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Enter your name"
-                  value={session?.user?.name || ''}
-                  {...register('name')}
-                />
+                <input type="text" placeholder="Enter your name" {...register('name')} />
                 {errors?.firstName && (
                   <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
                     {errors.firstName?.message}

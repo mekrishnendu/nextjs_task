@@ -23,6 +23,22 @@ export async function POST(request) {
   return NextResponse.json({ data: result, status, message });
 }
 
+// GET THE LIST
+export async function GET() {
+  let data = [];
+  let status = '';
+  try {
+    await mongoose.connect(connectionStr);
+    data = await Profile.find();
+    status = 200;
+  } catch {
+    data = 'some thing went wrong';
+    status = 500;
+  }
+
+  return NextResponse.json({ data, status });
+}
+
 // UPDATE
 export async function PUT(request, id) {
   console.log('put request', request, id);
