@@ -1,47 +1,163 @@
-import React from 'react';
-import './profile.module.scss';
+'use client';
+import React, { useState, useEffect } from 'react';
+import Style from './profile.module.scss';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Suspense } from 'react';
+import Loader from '@/app/components/loader';
+import { useSession } from 'next-auth/react';
+
+const phoneRegExp =
+  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
+const profileSchema = yup.object({
+  name: yup.string().required('First name is required'),
+  email: yup.string().email().required(),
+  phone: yup
+    .string()
+    .matches(phoneRegExp, 'Phone number is not valid')
+    .min(10, 'Please enter 10 digits')
+    .max(10, 'Please enter 10 digits'),
+  address: yup.string(),
+  hobby: yup.string(),
+});
 
 export default function Profile() {
+  const { data: session, status: sessionStatus } = useSession();
+  const [error, setError] = useState('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(profileSchema),
+  });
+
+  const onSubmit = async (values) => {
+    console.log('form hook', values);
+    let payload = {
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      address: values.address,
+      hobby: values.hobby,
+    };
+
+    try {
+      const res = await fetch('http://localhost:3000/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 400) {
+        setError('Some thing went wrong');
+      }
+      if (res.status === 200) {
+        setError('');
+      }
+    } catch (error) {
+      setError('Error, try again');
+      console.log('error', error);
+    }
+    console.log('values', payload);
+  };
+
   return (
     <div className="profile-outer flex justify-start">
       <div className="profile-pic bg-white rounded-xl h-80 w-60">pic</div>
-      <div className="profile-description-outer ml-20">
-        <div className="profile-description mb-40">
-          <div className="flex mb-2">
-            <div className="w-24">
-              <strong>Name:</strong>
+      <div className={`${Style.profile_description_outer} ml-20`}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="profile-description mb-40">
+            <div className="flex mb-2 ">
+              <div className="w-24 ">
+                <label>Name:</label>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  value={session?.user?.name || ''}
+                  {...register('name')}
+                />
+                {errors?.firstName && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.firstName?.message}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>David Doe</div>
-          </div>
 
-          <div className="flex mb-2">
-            <div className="w-24">
-              <strong>Email:</strong>
+            <div className="flex mb-2">
+              <div className="w-24">
+                <label>Email:</label>
+              </div>
+              <div>
+                {' '}
+                <input
+                  type="text"
+                  placeholder="Enter your email id"
+                  // value={session?.user.email || ''}
+                  // disabled
+                  {...register('email')}
+                />
+                {errors?.email && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.email?.message}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>david_doe@mailinator.com</div>
-          </div>
 
-          <div className="flex mb-2">
-            <div className="w-24">
-              <strong>Phone No:</strong>
+            <div className="flex mb-2">
+              <div className="w-24">
+                <label>Phone No:</label>
+              </div>
+              <div>
+                <input type="text" placeholder="Enter your mobile no" {...register('phone')} />
+                {errors?.phone && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.phone?.message}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>8923569856</div>
-          </div>
-
-          <div className="flex mb-2">
-            <div className="w-24">
-              <strong>Hobby:</strong>
+            <div className="flex mb-2">
+              <div className="w-24">
+                <lable>Address:</lable>
+              </div>
+              <div>
+                <input type="text" placeholder="Enter your address" {...register('address')} />
+                {errors?.address && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.address?.message}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>Hobby: Movie, Playing games, Music</div>
-          </div>
-
-          <div className="flex mb-2">
-            <div className="w-24">
-              <strong>Address:</strong>
+            <div className="flex mb-2">
+              <div className="w-24">
+                <lable>Hobby:</lable>
+              </div>
+              <div>
+                <textarea type="text" placeholder="Hobby" {...register('hobby')} />
+                {errors?.hobby && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.hobby?.message}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>4 Lindsay Street, Kolkata, West Bengal</div>
           </div>
-        </div>
+          <button
+            type="submit"
+            className="rounded-md bg-white text-black p-2  mb-5 w-52 hover:bg-slate-200"
+          >
+            Submit
+          </button>
+        </form>
         <div className="flex text-sm text-cyan-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -32,3 +32,19 @@ export async function POST(request) {
     });
   }
 }
+
+// GET THE USER LIST
+export async function GET() {
+  let data = [];
+  let status = '';
+  try {
+    await mongoose.connect(connectionStr);
+    data = await Member.find();
+    status = 200;
+  } catch {
+    data = 'some thing went wrong';
+    status = 500;
+  }
+
+  return NextResponse.json({ data, status });
+}

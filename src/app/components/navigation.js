@@ -18,7 +18,9 @@ export default function Navigation() {
           <Link href="#">
             <Image src="../images/logo.svg" alt="logo" width={50} height={50} className="mr-50" />
           </Link>
-          <span className="ml-24">{session && <h4>Welcome {session.user?.email} </h4>}</span>
+          <span className="ml-24">
+            {session && <h4>Welcome {session.user?.name || session.user?.email} </h4>}
+          </span>
         </div>
         <nav className="text-right">
           <ul className="text-gray-700 flex">
