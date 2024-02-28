@@ -12,3 +12,10 @@
     width: 350px;
   }
 }
+
+.edit_profile {
+  textarea,
+  input[type='text'] {
+    border-bottom: 1px solid #fff !important;
+  }
+}
