@@ -29,18 +29,6 @@ export default function Profile() {
   const [error, setError] = useState('');
   const [profiles, setProfiles] = useState([]);
 
-  async function getProfiles() {
-    let profilesData = await fetch(`http://localhost:3000/api/profile`);
-    profilesData = await profilesData.json();
-    let userProfile = profilesData.data.filter((data) => data.email === session?.user?.email);
-    console.log('userProfile', userProfile, session);
-    setProfiles(userProfile);
-  }
-
-  useEffect(() => {
-    getProfiles();
-  }, []);
-
   const {
     register,
     handleSubmit,
@@ -84,6 +72,19 @@ export default function Profile() {
     }
     console.log('values', payload);
   };
+
+  // GET PROFILE
+  async function getProfiles() {
+    let profilesData = await fetch(`http://localhost:3000/api/profile`);
+    profilesData = await profilesData.json();
+    console.log('userProfile', profilesData);
+    let userProfile = profilesData.data.filter((data) => data.email === session?.user?.email);
+    setProfiles(userProfile);
+  }
+
+  useEffect(() => {
+    getProfiles();
+  }, []);
 
   return (
     <div className="profile-outer flex justify-start">
