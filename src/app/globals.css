@@ -32,6 +32,10 @@
     z-index: 2;
 
 }
+.react-responsive-modal-modal{
+    padding: 0!important;
+    border-radius: 0.5rem;
+}
 
 @layer components {
     .item-box {

@@ -45,8 +45,8 @@ export default async function Members() {
                     <strong>Email:</strong> {user.email}
                   </li>
                   <li>
-                    <strong>Phone:</strong>
-                    {user.email}
+                    <strong>Phone:</strong>&nbsp;
+                    {user.phone}
                   </li>
                 </ul>
               </div>
