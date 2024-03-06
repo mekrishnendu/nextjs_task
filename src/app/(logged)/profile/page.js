@@ -7,6 +7,7 @@ import * as yup from 'yup';
 import { Suspense } from 'react';
 import Loader from '@/app/components/loader';
 import { useSession, getSession } from 'next-auth/react';
+import { BASE_URL } from '@/app/utils/constant';
 
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
@@ -32,7 +33,7 @@ export default function Profile() {
 
   // GET PROFILE
   async function getProfiles() {
-    let profilesData = await fetch(`http://localhost:3000/api/profile`);
+    let profilesData = await fetch(`${BASE_URL}/api/profile`);
     profilesData = await profilesData.json();
     let [userProfile] = profilesData.data.filter((data) => data.email === mail);
     setProfiles(userProfile);
@@ -63,7 +64,7 @@ export default function Profile() {
     };
 
     try {
-      const res = await fetch('http://localhost:3000/api/profile', {
+      const res = await fetch(`${BASE_URL}/api/profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ export default function Profile() {
       hobby: values.hobby,
     };
     try {
-      const res = await fetch(`http://localhost:3000/api/profile/${values._id}`, {
+      const res = await fetch(`${BASE_URL}/api/profile/${values._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +138,7 @@ export default function Profile() {
       <div
         className={`${Style.profile_description_outer} ${editProfile && Style.edit_profile} ml-20`}
       >
-        <h2 className="mb-5 text-xl font-semibold">Update your profile</h2>
+        <h2 className="mb-5 text-xl font-semibold">Update your profile </h2>
         <form
           onSubmit={handleSubmit(
             profiles && Object.keys(profiles).length > 0 > 0 ? onEditProfileSubmit : onSubmit

@@ -2,11 +2,12 @@ import React from 'react';
 import Image from 'next/image';
 import { Suspense } from 'react';
 import Loader from '@/app/components/loader';
+import { BASE_URL } from '@/app/utils/constant';
 
 async function getUsers() {
   //API DRVELOPED IN NEXTJS
   try {
-    let res = await fetch('http://localhost:3000/api/register');
+    let res = await fetch(`${BASE_URL}/api/register`);
     res = await res.json();
     console.log('students=====', res);
     return res.data;
