@@ -30,10 +30,10 @@ export default function ModalUI({ open, onCloseModal, isCloseOverlay, isCenter, 
         }}
         closeIcon={closeIcon}
       >
-        <div class="relative w-full max-h-full">
-          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{title}</h3>
+        <div className="relative w-full max-h-full">
+          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h3>
             </div>
             {children}
           </div>

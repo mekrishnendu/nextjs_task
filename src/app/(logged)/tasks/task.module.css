@@ -1,5 +1,0 @@
-.task {
-  height: 230px;
-  max-height: 230px;
-  @apply p-5 rounded-xl bg-[#4A4949] mb-10 mr-8  border-2 border-[#675F5F] shadow-lg shadow-cyan-400/50 hover:shadow-cyan-600/50;
-}

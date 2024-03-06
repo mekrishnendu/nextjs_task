@@ -1,12 +1,36 @@
 'use client';
 import React, { useState } from 'react';
-import Class from './task.module.css';
+import Class from './task.module.scss';
 import ModalUI from '@/app/components/modal';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Suspense } from 'react';
+import { BASE_URL } from '@/app/utils/constant';
+
+const taskSchema = yup.object({
+  name: yup.string().required('Name is required'),
+});
 
 export default function Task() {
   const [open, setShowModal] = useState(false);
+  const [error, setError] = useState('');
+  const [tasks, setTasks] = useState([]);
+
   const onOpenModal = () => setShowModal(true);
   const onCloseModal = () => setShowModal(false);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(taskSchema),
+    values: {
+      ...tasks,
+    },
+  });
 
   const modalProp = {
     open,
@@ -16,7 +40,7 @@ export default function Task() {
     title: 'Add task',
   };
   return (
-    <div className="task-outer">
+    <div className={Class.task_outer}>
       <div className="mb-10 flex items-center">
         <h2>Add your task</h2>
         <button
@@ -264,19 +288,64 @@ export default function Task() {
         </div>
       </div>
       <ModalUI {...modalProp}>
-        <form>
-          <div class="p-4 md:p-5 space-y-4">
-            {/* <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-            With less than a month to go before the European Union enacts new consumer privacy laws
-            for its citizens, companies around the world are updating their terms of service
-            agreements to comply.
-          </p>
-          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-            The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on
-            May 25 and is meant to ensure a common set of data rights in the European Union. It
-            requires organizations to notify users as soon as possible of high-risk data breaches
-            that could personally affect them.
-          </p> */}
+        <form className={Class.task_form}>
+          <div className="p-4 md:p-5 space-y-4 text-white">
+            <div className="flex mb-2 ">
+              <div className="w-40 ">
+                <label>Task Name:</label>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  {...register('name')}
+                  className="py-2 px-4 rounded-md text-sm text-black ml-2"
+                />
+                {errors?.name && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.name?.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex mb-2 ">
+              <div className="w-40 ">
+                <label>Task Description:</label>
+              </div>
+              <div className="relative">
+                <textarea
+                  type="text"
+                  placeholder="Enter your name"
+                  {...register('name')}
+                  className="py-2 px-4 rounded-md text-sm text-black ml-2"
+                />
+                {errors?.name && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.name?.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex mb-2 ">
+              <div className="w-40 ">
+                <label>Date:</label>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  {...register('name')}
+                  className="py-2 px-4 rounded-md text-sm text-black ml-2"
+                />
+                {errors?.name && (
+                  <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                    {errors.name?.message}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">

@@ -1,0 +1,18 @@
+.task {
+  height: 230px;
+  max-height: 230px;
+  @apply p-5 rounded-xl bg-[#4A4949] mb-10 mr-8  border-2 border-[#675F5F] shadow-lg shadow-cyan-400/50 hover:shadow-cyan-600/50;
+}
+
+.task_form {
+  label {
+    font-weight: 300;
+  }
+  textarea,
+  input[type='text'] {
+    // color: darkolivegreen;
+    // padding: 2px 4px;
+    // font-size: 14px;
+    width: 350px;
+  }
+}
