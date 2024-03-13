@@ -17,11 +17,18 @@ const closeIcon = (
   </svg>
 );
 
-export default function ModalUI({ open, onCloseModal, isCloseOverlay, isCenter, title, children }) {
+export default function ModalUI({
+  showModal,
+  onCloseModal,
+  isCloseOverlay,
+  isCenter,
+  title,
+  children,
+}) {
   return (
     <div>
       <Modal
-        open={open}
+        open={showModal}
         onClose={onCloseModal}
         center={isCenter}
         closeOnOverlayClick={isCloseOverlay}
