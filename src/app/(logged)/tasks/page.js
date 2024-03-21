@@ -12,26 +12,32 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Link from 'next/link';
 let moment = require('moment');
 
-const taskData = {
-  taskName: 'Timesheet fill up',
-  taskDescription: 'Today need to fillup the task',
-  taskDate: new Date(),
-};
-
 const taskSchema = yup.object({
   taskName: yup.string().required('Task name is required'),
   taskDescription: yup.string().required('Description  is required'),
   taskDate: yup.string().required('Date is required'),
-  // taskStatus: yup.boolean(),
+  isCompleted: yup.boolean(),
 });
+
+async function fetchTaskList() {
+  try {
+    let tasks = await fetch(`${BASE_URL}/api/tasks`);
+    tasks = await tasks.json();
+    console.log('tasks', tasks);
+    return tasks.data;
+  } catch (err) {
+    console.log('task lists error', err);
+  }
+}
 
 export default function Task() {
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [error, setError] = useState('');
-  const [tasks, setTasks] = useState([]);
+  const [taskList, setTaskList] = useState([]);
   const [taskDate, setTaskDate] = useState(new Date());
+  const [taskValue, setTaskValue] = useState({});
 
   const onOpenModal = () => setShowTaskModal(true);
 
@@ -41,6 +47,7 @@ export default function Task() {
       taskName: '',
       taskDescription: '',
       taskDate: new Date(),
+      isCompleted: false,
     });
   };
 
@@ -49,6 +56,7 @@ export default function Task() {
     setShowTaskModal(false);
     setTaskDate(new Date());
     resetFormHandler();
+    setTaskValue({});
   };
 
   const {
@@ -56,6 +64,7 @@ export default function Task() {
     handleSubmit,
     watch,
     setValue,
+    getValues,
     reset,
     formState: { errors, isSubmitSuccessful, touchedFields, isSubmitting, submitCount },
   } = useForm({
@@ -64,6 +73,7 @@ export default function Task() {
       taskName: '',
       taskDescription: '',
       taskDate: new Date(),
+      isCompleted: false,
     },
   });
 
@@ -73,7 +83,7 @@ export default function Task() {
       ...values,
       taskDate: moment(new Date(values.taskDate)).format('MM/DD/YYYY'),
     };
-
+    console.log('form hook##', payload);
     try {
       const addTask = await fetch(`${BASE_URL}/api/tasks`, {
         method: 'POST',
@@ -93,13 +103,13 @@ export default function Task() {
       setError('Error!!!, please try again');
     }
     onCloseTaskModal();
-    console.log('form hook##', payload);
   };
 
   // EDIT TASK
-  const onEditTaskHandler = () => {
+  const onEditTaskHandler = (values) => {
     setShowTaskModal(true);
-    reset(taskData);
+    reset(values);
+    setTaskValue(values);
   };
 
   const modalProp = {
@@ -118,21 +128,23 @@ export default function Task() {
     title: 'Success',
   };
 
-  // useEffect(() => {
-  //   if (formState.isSubmitSuccessful) {
-  //     reset({});
-  //   }
-  // });
-
   const onCloseSuccessModal = () => {
     setShowSuccessModal(false);
   };
+
+  useEffect(() => {
+    const getTaskList = async () => {
+      const users = await fetchTaskList();
+      setTaskList(users);
+    };
+    getTaskList();
+  }, []);
 
   return (
     <div className={Class.task_outer}>
       <div className="mb-10 flex items-center">
         {/* {moment(taskDate).format('MM/DD/YYYY')} */}
-        {console.log('tasks', tasks)}
+
         <h2>Add your task</h2>
         <button
           type="button"
@@ -143,246 +155,67 @@ export default function Task() {
         </button>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        <div className={`${Class.task}`}>
-          <h2 className="mb-2 text-xl">Update Password</h2>
-          <p className="mb-4">Review online accounts and update password for better security</p>
-          <p className="mb-4 text-sm">
-            <strong>12/12/24</strong>
-          </p>
-          <div className="flex justify-between">
-            <div className="rounded-full bg-white px-4  py-2 text-center text-[#090909] text-sm">
-              Completed
-            </div>
-            <div className="flex justify-between">
-              <Link href="#">
-                <svg
-                  data-slot="icon"
-                  fill="none"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                  width={30}
+        {console.log('taskList', taskList)}
+        {taskList.map((task) => (
+          <>
+            <div className={`${Class.task}`} key={task.id}>
+              <h2 className="mb-2 text-xl">{task.taskName}</h2>
+              <p className="mb-4">{task.taskDescription}</p>
+              <p className="mb-4 text-sm">
+                <strong>{task.taskDate}</strong>
+              </p>
+              <div className="flex justify-between">
+                <div
+                  className={`rounded-full ${
+                    task.isCompleted ? 'bg-green-700 text-white' : 'bg-white'
+                  } px-4  py-2 text-center text-[#090909] text-sm`}
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                  ></path>
-                </svg>
-              </Link>
+                  {task.isCompleted ? 'Completed' : 'Pending'}
+                </div>
+                <div className="flex justify-between">
+                  <Link href="#">
+                    <svg
+                      data-slot="icon"
+                      fill="none"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      width={30}
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                      ></path>
+                    </svg>
+                  </Link>
 
-              <Link href="#" onClick={() => onEditTaskHandler()}>
-                <svg
-                  data-slot="icon"
-                  fill="none"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                  className="ml-5"
-                  width={30}
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                  ></path>
-                </svg>
-              </Link>
+                  <Link href="#" onClick={() => onEditTaskHandler(task)}>
+                    <svg
+                      data-slot="icon"
+                      fill="none"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      className="ml-5"
+                      width={30}
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                      ></path>
+                    </svg>
+                  </Link>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className={`${Class.task}`}>
-          <h2 className="mb-2 text-xl">Update Password</h2>
-          <p className="mb-4">Review online accounts and update password for better security</p>
-          <p className="mb-4 text-sm">
-            <strong>12/12/24</strong>
-          </p>
-          <div className="flex justify-between">
-            <div className="rounded-full bg-white px-4  py-2 text-center text-[#090909] text-sm">
-              Completed
-            </div>
-            <div className="flex justify-between">
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                width={50}
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                ></path>
-              </svg>
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                className="ml-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${Class.task}`}>
-          <h2 className="mb-2 text-xl">Update Password</h2>
-          <p className="mb-4">Review online accounts and update password for better security</p>
-          <p className="mb-4 text-sm">
-            <strong>12/12/24</strong>
-          </p>
-          <div className="flex justify-between">
-            <div className="rounded-full bg-white px-4  py-2 text-center text-[#090909] text-sm">
-              Completed
-            </div>
-            <div className="flex justify-between">
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                width={50}
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                ></path>
-              </svg>
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                className="ml-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${Class.task}`}>
-          <h2 className="mb-2 text-xl">Update Password</h2>
-          <p className="mb-4">Review online accounts and update password for better security</p>
-          <p className="mb-4 text-sm">
-            <strong>12/12/24</strong>
-          </p>
-          <div className="flex justify-between">
-            <div className="rounded-full bg-white px-4  py-2 text-center text-[#090909] text-sm">
-              Completed
-            </div>
-            <div className="flex justify-between">
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                width={50}
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                ></path>
-              </svg>
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                className="ml-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${Class.task}`}>
-          <h2 className="mb-2 text-xl">Update Password</h2>
-          <p className="mb-4">Review online accounts and update password for better security</p>
-          <p className="mb-4 text-sm">
-            <strong>12/12/24</strong>
-          </p>
-          <div className="flex justify-between">
-            <div className="rounded-full bg-white px-4  py-2 text-center text-[#090909] text-sm">
-              Completed
-            </div>
-            <div className="flex justify-between">
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                width={50}
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                ></path>
-              </svg>
-              <svg
-                data-slot="icon"
-                fill="none"
-                stroke-width="1.5"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                className="ml-5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+          </>
+        ))}
       </div>
       <ModalUI {...modalProp}>
         <form className={Class.task_form} onSubmit={handleSubmit(onSubmitTask)}>
@@ -443,6 +276,42 @@ export default function Task() {
                 {errors?.taskDate && (
                   <p className="text-xs  bottom-[-20px] right-0 text-amber-300 pb-1">
                     {errors.taskDate?.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex mb-2 ">
+              <div className="w-40 ">
+                <label>Task Status:</label>
+              </div>
+              <div className="relative">
+                <input
+                  {...register('isCompleted')}
+                  type="radio"
+                  id="statusPending"
+                  value={false}
+                  checked={!taskValue.isCompleted ? true : false}
+                />
+                <label for="statusPending" className="ml-2">
+                  Pending
+                </label>
+
+                <input
+                  {...register('isCompleted')}
+                  type="radio"
+                  id="statusCompleted"
+                  value={true}
+                  className="ml-5"
+                  checked={taskValue.isCompleted ? true : false}
+                />
+                <label for="statusCompleted" className="ml-2">
+                  Completed
+                </label>
+
+                {errors?.isCompleted && (
+                  <p className="text-xs  bottom-[-20px] right-0 text-amber-300 pb-1">
+                    {errors.isCompleted?.message}
                   </p>
                 )}
               </div>

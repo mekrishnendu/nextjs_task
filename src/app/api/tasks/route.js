@@ -5,13 +5,13 @@ import { Task } from '@/app/lib/model/tasks';
 
 // TASK ADD
 export async function POST(request) {
-  const { taskName, taskDescription, taskDate, taskStatus } = await request.json();
+  const { taskName, taskDescription, taskDate, isCompleted } = await request.json();
   await mongoose.connect(connectionStr);
   const addTask = new Task({
     taskName,
     taskDescription,
     taskDate,
-    taskStatus,
+    isCompleted,
   });
 
   try {
