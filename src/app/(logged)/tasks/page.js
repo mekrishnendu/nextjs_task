@@ -68,6 +68,17 @@ export default function Task() {
     setTaskValue({});
   };
 
+  const form = useForm({
+    defaultValues: {
+      hello: 'world',
+      taskName: '',
+      taskDescription: '',
+      taskDate: new Date(),
+      isCompleted: false,
+    },
+    mode: 'onChange',
+  });
+
   const {
     register,
     handleSubmit,
@@ -76,15 +87,7 @@ export default function Task() {
     getValues,
     reset,
     formState: { errors, isSubmitSuccessful, touchedFields, isSubmitting, submitCount },
-  } = useForm({
-    resolver: yupResolver(taskSchema),
-    defaultValues: {
-      taskName: '',
-      taskDescription: '',
-      taskDate: new Date(),
-      isCompleted: false,
-    },
-  });
+  } = form;
 
   //TASK SUBMIT
   const onSubmitTask = async (values) => {
@@ -279,6 +282,8 @@ export default function Task() {
           )}
         >
           <div className="p-4 md:p-5 space-y-4 text-white">
+            {/* <pre>{JSON.stringify(form.watch(), null, 2)}</pre> */}
+
             <div className="flex mb-2 ">
               <div className="w-40 ">
                 <label>Task Name:</label>
