@@ -10,6 +10,8 @@ import { BASE_URL } from '@/app/utils/constant';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Link from 'next/link';
+import Loader from '@/app/components/loader';
+
 let moment = require('moment');
 
 const taskSchema = yup.object({
@@ -19,27 +21,34 @@ const taskSchema = yup.object({
   isCompleted: yup.boolean(),
 });
 
-async function fetchTaskList() {
-  try {
-    let tasks = await fetch(`${BASE_URL}/api/tasks`);
-    tasks = await tasks.json();
-    console.log('tasks', tasks);
-    return tasks.data;
-  } catch (err) {
-    console.log('task lists error', err);
-  }
-}
-
 export default function Task() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [taskMessage, setTaskMessage] = useState('');
 
   const [error, setError] = useState('');
   const [taskList, setTaskList] = useState([]);
+  const [taskLoading, setTaskLoading] = useState(false);
+
   const [taskDate, setTaskDate] = useState(new Date());
   const [taskValue, setTaskValue] = useState({});
 
   const onOpenModal = () => setShowTaskModal(true);
+
+  //FETCH TASK
+  async function fetchTaskList() {
+    setTaskLoading(true);
+    try {
+      let tasks = await fetch(`${BASE_URL}/api/tasks`);
+      tasks = await tasks.json();
+      console.log('tasks', tasks);
+      setTaskLoading(false);
+      return setTaskList(tasks.data);
+    } catch (err) {
+      setTaskLoading(false);
+      console.log('task lists error', err);
+    }
+  }
 
   //RESET FORM
   const resetFormHandler = () => {
@@ -77,6 +86,7 @@ export default function Task() {
     },
   });
 
+  //TASK SUBMIT
   const onSubmitTask = async (values) => {
     console.log('form hook', values);
     const payload = {
@@ -84,6 +94,7 @@ export default function Task() {
       taskDate: moment(new Date(values.taskDate)).format('MM/DD/YYYY'),
     };
     console.log('form hook##', payload);
+    setTaskLoading(true);
     try {
       const addTask = await fetch(`${BASE_URL}/api/tasks`, {
         method: 'POST',
@@ -98,11 +109,51 @@ export default function Task() {
       if (addTask.status === 200) {
         setError('');
         setShowSuccessModal(true);
+        fetchTaskList();
+        setTaskLoading(false);
+        setTaskMessage('Task has been added successfully');
       }
     } catch (error) {
       setError('Error!!!, please try again');
+      setTaskLoading(false);
     }
     onCloseTaskModal();
+  };
+
+  //ON EDIT TASK
+  const onEditTaskSubmission = async (values) => {
+    console.log('form hook edit==', values);
+    const payload = {
+      ...values,
+      taskDate: moment(new Date(values.taskDate)).format('MM/DD/YYYY'),
+    };
+
+    setTaskLoading(true);
+    try {
+      const res = await fetch(`${BASE_URL}/api/tasks/${values._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 400) {
+        setError('Some thing went wrong');
+      }
+      if (res.status === 200) {
+        setError('');
+        setTaskMessage('Task has been updated successfully');
+        setShowSuccessModal(true);
+      }
+      fetchTaskList();
+      setTaskLoading(false);
+    } catch (error) {
+      setError('Error, try again');
+      console.log('error', error);
+      setTaskLoading(false);
+    }
+    onCloseTaskModal();
+    console.log('values', payload);
   };
 
   // EDIT TASK
@@ -130,14 +181,11 @@ export default function Task() {
 
   const onCloseSuccessModal = () => {
     setShowSuccessModal(false);
+    setTaskMessage('');
   };
 
   useEffect(() => {
-    const getTaskList = async () => {
-      const users = await fetchTaskList();
-      setTaskList(users);
-    };
-    getTaskList();
+    fetchTaskList();
   }, []);
 
   return (
@@ -156,69 +204,80 @@ export default function Task() {
       </div>
       <div className="grid grid-cols-3 gap-4">
         {console.log('taskList', taskList)}
-        {taskList.map((task) => (
-          <>
-            <div className={`${Class.task}`} key={task.id}>
-              <h2 className="mb-2 text-xl">{task.taskName}</h2>
-              <p className="mb-4">{task.taskDescription}</p>
-              <p className="mb-4 text-sm">
-                <strong>{task.taskDate}</strong>
-              </p>
-              <div className="flex justify-between">
-                <div
-                  className={`rounded-full ${
-                    task.isCompleted ? 'bg-green-700 text-white' : 'bg-white'
-                  } px-4  py-2 text-center text-[#090909] text-sm`}
-                >
-                  {task.isCompleted ? 'Completed' : 'Pending'}
-                </div>
-                <div className="flex justify-between">
-                  <Link href="#">
-                    <svg
-                      data-slot="icon"
-                      fill="none"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                      width={30}
+        <Suspense fallback={<Loader />}>
+          {taskLoading ? (
+            <Loader />
+          ) : (
+            taskList.map((task) => (
+              <>
+                <div className={`${Class.task}`} key={task.id}>
+                  <h2 className="mb-2 text-xl">{task.taskName}</h2>
+                  <p className="mb-4">{task.taskDescription}</p>
+                  <p className="mb-4 text-sm">
+                    <strong>{task.taskDate}</strong>
+                  </p>
+                  <div className="flex justify-between">
+                    <div
+                      className={`rounded-full ${
+                        task.isCompleted ? 'bg-green-700 text-white' : 'bg-white'
+                      } px-4  py-2 text-center text-[#090909] text-sm`}
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                      ></path>
-                    </svg>
-                  </Link>
+                      {task.isCompleted ? 'Completed' : 'Pending'}
+                    </div>
+                    <div className="flex justify-between">
+                      <Link href="#">
+                        <svg
+                          data-slot="icon"
+                          fill="none"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                          width={30}
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                          ></path>
+                        </svg>
+                      </Link>
 
-                  <Link href="#" onClick={() => onEditTaskHandler(task)}>
-                    <svg
-                      data-slot="icon"
-                      fill="none"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                      className="ml-5"
-                      width={30}
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                      ></path>
-                    </svg>
-                  </Link>
+                      <Link href="#" onClick={() => onEditTaskHandler(task)}>
+                        <svg
+                          data-slot="icon"
+                          fill="none"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                          className="ml-5"
+                          width={30}
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                          ></path>
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </>
-        ))}
+              </>
+            ))
+          )}
+        </Suspense>
       </div>
       <ModalUI {...modalProp}>
-        <form className={Class.task_form} onSubmit={handleSubmit(onSubmitTask)}>
+        <form
+          className={Class.task_form}
+          onSubmit={handleSubmit(
+            Object.keys(taskValue).length > 0 ? onEditTaskSubmission : onSubmitTask
+          )}
+        >
           <div className="p-4 md:p-5 space-y-4 text-white">
             <div className="flex mb-2 ">
               <div className="w-40 ">
@@ -340,7 +399,7 @@ export default function Task() {
       <ModalUI {...modalSuccessProp}>
         <div className="text-center">
           <div className="p-10">
-            <h1 className="text-white mb-10">Task has been added successfully</h1>
+            <h1 className="text-white mb-10">{taskMessage}</h1>
           </div>
           <div className="flex py-4 md:py-5 border-t border-gray-200 rounded-b dark:border-gray-600">
             <button
