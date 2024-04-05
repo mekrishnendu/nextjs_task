@@ -30,12 +30,18 @@ export default function Profile() {
   const [profiles, setProfiles] = useState([]);
   const [mail, setMail] = useState();
   const [editProfile, setEditProfile] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // GET PROFILE
   async function getProfiles() {
-    let profilesData = await fetch(`${BASE_URL}/api/profile`);
+    let profilesData = {};
+    profilesData = await fetch(`${BASE_URL}/api/profile`);
     profilesData = await profilesData.json();
     let [userProfile] = profilesData.data.filter((data) => data.email === mail);
+    console.log('profilesData', userProfile);
+    if (Object.keys(profilesData).length > 0) {
+      setLoading(false);
+    }
     setProfiles(userProfile);
   }
 
@@ -139,148 +145,154 @@ export default function Profile() {
         className={`${Style.profile_description_outer} ${editProfile && Style.edit_profile} ml-20`}
       >
         <h2 className="mb-5 text-xl font-semibold">Update your profile </h2>
-        <form
-          onSubmit={handleSubmit(
-            profiles && Object.keys(profiles).length > 0 > 0 ? onEditProfileSubmit : onSubmit
-          )}
-        >
-          <Suspense fallback={<Loader />}>
-            <div className="profile-description mb-40">
-              <div className="flex mb-2 ">
-                <div className="w-24 ">
-                  <label>Name:</label>
-                </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Enter your name"
-                    {...register('name')}
-                    disabled={!editProfile}
-                  />
-                  {errors?.name && (
-                    <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
-                      {errors.name?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex mb-2">
-                <div className="w-24">
-                  <label>Email:</label>
-                </div>
-                <div>
-                  {' '}
-                  <input
-                    type="text"
-                    placeholder="Enter your email id"
-                    {...register('email')}
-                    disabled={!editProfile}
-                  />
-                  {errors?.email && (
-                    <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
-                      {errors.email?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex mb-2">
-                <div className="w-24">
-                  <label>Phone No:</label>
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Enter your mobile no"
-                    {...register('phone')}
-                    disabled={!editProfile}
-                  />
-                  {errors?.phone && (
-                    <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
-                      {errors.phone?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex mb-2">
-                <div className="w-24">
-                  <lable>Address:</lable>
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Enter your address"
-                    {...register('address')}
-                    disabled={!editProfile}
-                  />
-                  {errors?.address && (
-                    <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
-                      {errors.address?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex mb-2">
-                <div className="w-24">
-                  <lable>Hobby:</lable>
-                </div>
-                <div>
-                  <textarea
-                    type="text"
-                    placeholder="Hobby"
-                    {...register('hobby')}
-                    disabled={!editProfile}
-                  />
-                  {errors?.hobby && (
-                    <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
-                      {errors.hobby?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Suspense>
-
-          {editProfile && (
-            <>
-              <button
-                type="submit"
-                className="rounded-md bg-white text-black p-2  mb-5 w-52 hover:bg-slate-200"
-              >
-                Submit
-              </button>
-
-              <button
-                type="button"
-                className="rounded-md bg-red-300 text-black p-2  mb-5 w-52 hover:bg-red-400 ml-5"
-                onClick={() => setEditProfile(false)}
-              >
-                Cancel
-              </button>
-            </>
-          )}
-        </form>
-        {!editProfile && (
-          <div className="flex text-sm text-cyan-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-6 h-6"
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <form
+              onSubmit={handleSubmit(
+                profiles && Object.keys(profiles).length > 0 > 0 ? onEditProfileSubmit : onSubmit
+              )}
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-              />
-            </svg>
-            <span className="ml-2 mt-1 cursor-pointer" onClick={() => setEditProfile(true)}>
-              Edit Profile
-            </span>
-          </div>
+              <Suspense fallback={<Loader />}>
+                <div className="profile-description mb-40">
+                  <div className="flex mb-2 ">
+                    <div className="w-24 ">
+                      <label>Name:</label>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Enter your name"
+                        {...register('name')}
+                        disabled={!editProfile}
+                      />
+                      {errors?.name && (
+                        <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                          {errors.name?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex mb-2">
+                    <div className="w-24">
+                      <label>Email:</label>
+                    </div>
+                    <div>
+                      {' '}
+                      <input
+                        type="text"
+                        placeholder="Enter your email id"
+                        {...register('email')}
+                        disabled={!editProfile}
+                      />
+                      {errors?.email && (
+                        <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                          {errors.email?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex mb-2">
+                    <div className="w-24">
+                      <label>Phone No:</label>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Enter your mobile no"
+                        {...register('phone')}
+                        disabled={!editProfile}
+                      />
+                      {errors?.phone && (
+                        <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                          {errors.phone?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex mb-2">
+                    <div className="w-24">
+                      <lable>Address:</lable>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Enter your address"
+                        {...register('address')}
+                        disabled={!editProfile}
+                      />
+                      {errors?.address && (
+                        <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                          {errors.address?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex mb-2">
+                    <div className="w-24">
+                      <lable>Hobby:</lable>
+                    </div>
+                    <div>
+                      <textarea
+                        type="text"
+                        placeholder="Hobby"
+                        {...register('hobby')}
+                        disabled={!editProfile}
+                      />
+                      {errors?.hobby && (
+                        <p className="text-xs  bottom-[-20px] right-0 bg-red-700 px-2 pb-1">
+                          {errors.hobby?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Suspense>
+
+              {editProfile && (
+                <>
+                  <button
+                    type="submit"
+                    className="rounded-md bg-white text-black p-2  mb-5 w-52 hover:bg-slate-200"
+                  >
+                    Submit
+                  </button>
+
+                  <button
+                    type="button"
+                    className="rounded-md bg-red-300 text-black p-2  mb-5 w-52 hover:bg-red-400 ml-5"
+                    onClick={() => setEditProfile(false)}
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+            </form>
+            {!editProfile && (
+              <div className="flex text-sm text-cyan-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                  />
+                </svg>
+                <span className="ml-2 mt-1 cursor-pointer" onClick={() => setEditProfile(true)}>
+                  Edit Profile
+                </span>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

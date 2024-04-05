@@ -28,7 +28,7 @@ export default function Task() {
 
   const [error, setError] = useState('');
   const [taskList, setTaskList] = useState([]);
-  const [taskLoading, setTaskLoading] = useState(false);
+  const [taskLoading, setTaskLoading] = useState(true);
 
   const [taskDate, setTaskDate] = useState(new Date());
   const [taskValue, setTaskValue] = useState({});
@@ -37,7 +37,6 @@ export default function Task() {
 
   //FETCH TASK
   async function fetchTaskList() {
-    setTaskLoading(true);
     try {
       let tasks = await fetch(`${BASE_URL}/api/tasks`);
       tasks = await tasks.json();
@@ -205,13 +204,15 @@ export default function Task() {
           Click here
         </button>
       </div>
-      <div className="grid grid-cols-3 gap-4">
-        {console.log('taskList', taskList)}
-        <Suspense fallback={<Loader />}>
-          {taskLoading ? (
-            <Loader />
-          ) : (
-            taskList.map((task) => (
+      {taskLoading ? (
+        <div className="flex items-center justify-center">
+          <Loader />
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          {console.log('taskList', taskList)}
+          <Suspense fallback={<Loader />}>
+            {taskList.map((task) => (
               <>
                 <div className={`${Class.task}`} key={task.id}>
                   <h2 className="mb-2 text-xl">{task.taskName}</h2>
@@ -270,10 +271,11 @@ export default function Task() {
                   </div>
                 </div>
               </>
-            ))
-          )}
-        </Suspense>
-      </div>
+            ))}
+          </Suspense>
+        </div>
+      )}
+
       <ModalUI {...modalProp}>
         <form
           className={Class.task_form}
